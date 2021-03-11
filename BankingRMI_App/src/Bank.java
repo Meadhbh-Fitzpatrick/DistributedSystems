@@ -8,21 +8,13 @@ import java.util.List;
 
 public class Bank implements IBank {
 	private List<Account> accounts; // users accounts
-	
+	Session session;
 	public Bank() throws RemoteException
 	{
 	}
 	
-	private static final SecureRandom secureRandom = new SecureRandom(); //threadsafe
-	private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder(); //threadsafe
-
-	public static String generateNewToken() {
-	    byte[] randomBytes = new byte[24];
-	    secureRandom.nextBytes(randomBytes);
-	    return base64Encoder.encodeToString(randomBytes);
-	}
 	
-	public long login(String username, String password) throws RemoteException, InvalidLogin {
+	public long login(String username, String password) throws RemoteException, InvalidLogin, InvalidSession {
 		try {
 			for (Account i:accounts)
 			{
@@ -30,30 +22,71 @@ public class Bank implements IBank {
 				{
 					if (i.password == password)
 					{
-						return generateNewToken();
+						Session sesh = new Session(username);
+						session = sesh;
+						return sesh.id;
 					}
-					//throw new InvalidLogin();
+					throw new InvalidLogin();
 				}
 				throw new InvalidLogin();
 			}
+			throw new InvalidLogin();
 		}
 		catch (InvalidLogin IL){
 				System.out.println("Invalid Login for User: " +IL.getUsername());
 			}
+		return (Long) null;
 	}
 
 	public void deposit(int accountnum, BigDecimal amount, long sessionID) throws RemoteException, InvalidSession {
-		// TODO Auto-generated method stub
-		
+		try {
+			if (sessionID != session.id) {
+				throw new InvalidSession();
+				}
+			for (Account i:accounts) {
+				if (accountnum == i.accountNum)
+				{
+					i.balance.add(amount);
+				}
+			}
+		}
+		catch (InvalidSession IS) {
+			System.out.println("Invalid Session for User: " +IS.getUsername());
+		}
 	}
 
 	public void withdraw(int accountnum, BigDecimal amount, long sessionID) throws RemoteException, InvalidSession {
-		// TODO Auto-generated method stub
-		
+		try {
+			if (sessionID != session.id) {
+				throw new InvalidSession();
+				}
+			for (Account i:accounts) {
+				if (accountnum == i.accountNum)
+				{
+					i.balance.subtract(amount);
+				}
+			}
+		}
+		catch (InvalidSession IS) {
+			System.out.println("Invalid Session for User: " +IS.getUsername());
+		}
 	}
 
 	public BigDecimal getBalance(int accountnum, long sessionID) throws RemoteException, InvalidSession {
-		// TODO Auto-generated method stub
+		try {
+			if (sessionID != session.id) {
+				throw new InvalidSession();
+				}
+			for (Account i:accounts) {
+				if (accountnum == i.accountNum)
+				{
+					return i.balance;
+				}
+			}
+		}
+		catch (InvalidSession IS) {
+			System.out.println("Invalid Session for User: " +IS.getUsername());
+		}
 		return null;
 	}
 
