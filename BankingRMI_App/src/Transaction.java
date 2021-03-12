@@ -1,22 +1,31 @@
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 import java.io.Serializable;
 
 public class Transaction implements Serializable {
 
 	private static final long serialVersionUID = 8803216572303579376L;
 	public BigDecimal amount;
-	public Date date;
+	public LocalDate date;
+	public String description;
 	
 	// Needs some accessor methods to return information about the transaction
+	
+	public Transaction(BigDecimal amount, LocalDate date, String description) {
+		amount = this.amount;
+		date = this.date;
+		description = this.description;
+	}
 	
 	public BigDecimal getAmount() {
 		return amount;
 	}
 	
-	public Date getDate() {
+	public LocalDate getDate() {
 	return date;
 	}
 	
-	public String description;
+	public void PrintTransaciton(Transaction t) {
+		System.out.println("Transaction Details : Amount - " + t.amount.toString() + "Date - " + t.date.toString() + t.description);
+	}
 } 

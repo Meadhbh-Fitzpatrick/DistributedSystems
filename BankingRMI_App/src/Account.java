@@ -10,8 +10,8 @@ public class Account {
 	
 	public Account(String Username, String password, BigDecimal openingBalance) throws RemoteException {
 		username = Username;
-		password = this.password;
-		openingBalance = balance;
+		this.password = password;
+		balance = openingBalance;
 		accountNum = accountNum++;
 		accountNum++;
 	}

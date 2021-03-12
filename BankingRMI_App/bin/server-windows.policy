@@ -1,0 +1,4 @@
+grant codeBase "file:/C:/Users/Jack/gitrepos/DistributedSystems/BankingRMI_App/bin" {
+    permission java.security.AllPermission;
+};
+

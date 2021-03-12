@@ -1,16 +1,23 @@
 import java.beans.Statement;
 import java.math.BigDecimal;
+import java.rmi.Naming;
+import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.rmi.registry.Registry; 
+import java.rmi.registry.LocateRegistry; 
+import java.rmi.server.UnicastRemoteObject; 
 
-public class Bank implements IBank {
-	private List<Account> accounts; // users accounts
+public class Bank extends UnicastRemoteObject implements IBank {
+	private static List<Account> accounts = new ArrayList<Account>(); // users accounts
 	Session session;
 	public Bank() throws RemoteException
 	{
+		super();
 	}
 	
 	
@@ -91,11 +98,37 @@ public class Bank implements IBank {
 	}
 
 	public Statement getStatement(Date from, Date to, long sessionID) throws RemoteException, InvalidSession {
-		// TODO Auto-generated method stub
+		try {
+			if (sessionID != session.id) {
+				throw new InvalidSession();
+				}
+		}
+			// Statement Code to Go Here
+			catch (InvalidSession IS) {
+				System.out.println("Invalid Session for User: " +IS.getUsername());
+			}
 		return null;
 	}
 	
 	public static void main(String args[]) throws Exception {
 		// initialise Bank server - see sample code in the notes and online RMI tutorials for details
+		//Not used to working with BigDecimal (Or Java these days) so this is a little awkward
+		BigDecimal dec = new BigDecimal(10.50);
+		Account jmg = new Account("Jack McGirl", "1234", dec);
+		dec = dec.add(dec);
+		Account mf = new Account("Meadhbh Fitzpatrick", "2020", dec);
+		accounts.add(jmg);
+		accounts.add(mf);
+		try { 
+			 //System.setSecurityManager(new SecurityManager());
+			 //LocateRegistry.createRegistry(2020);
+	         IBank bank = new Bank(); 
+	         Registry registry = LocateRegistry.createRegistry(2001);
+	         registry.rebind("Bank", bank);
+	         System.err.println("Server ready"); 
+	      } catch (Exception e) { 
+	         System.err.println("Server exception: " + e.toString()); 
+	         e.printStackTrace(); 
+	      } 
 		}
 }
