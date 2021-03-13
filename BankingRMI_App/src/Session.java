@@ -1,6 +1,7 @@
 import java.rmi.RemoteException;
 import java.time.LocalTime;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Session {
 	public long id;
@@ -24,20 +25,19 @@ public class Session {
 		currTime = LocalTime.now();
 	}
 	
-	// Generates a random Session ID
+	// Generates a random Session ID between 0 and 10,000
 	private void setID() {
-		id = new Random().nextLong();
+		id = ThreadLocalRandom.current().nextLong(10000);
 	}
 	
-	// Compares current time to the set expiry time recursively, if the current time is after the session time, throw an exception
-	private void sessionMonitor() throws InvalidSession {
+	// Compares current time to the set expiry time, if the current time is after the session time, throw an exception
+	public void sessionMonitor() throws InvalidSession {
 		try {
 			currTime = LocalTime.now();
 			if (currTime.isAfter(expireTime)) {
 				expired = true;
 				throw new InvalidSession();
 			}
-			sessionMonitor();
 		}
 		catch (InvalidSession IS){
 			System.out.println("Session for user " +IS.getUsername()+ "expired at " +expireTime.toString());

@@ -16,7 +16,6 @@ public class BankClient {
 			BigDecimal balance;
 			long sessionId;
 			System.out.println("Connected to Server");
-			//System.out.println("Please Login in the form \"login username password\"");
 			Operations(server);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
@@ -34,24 +33,30 @@ public class BankClient {
 		Scanner in = new Scanner(System.in);
 		String toSplit = in.nextLine();
 		String[] instructions = toSplit.split(",");
-		BigDecimal amount = new BigDecimal(instructions[2]);
+		BigDecimal amount = null;
+		if (instructions.length == 2) {
+			amount = new BigDecimal(instructions[1]);
+		}
+		else {
+			amount = new BigDecimal(instructions[2]);
+		}
 		if (instructions[0].equals("login")) {
-			System.out.println(instructions[1]);
-			System.out.println(instructions[2]);
-			server.login(instructions[1], instructions[2]);
-			System.out.println("Login Sucessful");
-			System.out.println("Please enter instructions in the form \"instruction amount sessionID \"");
-			System.out.println("Valid Instructions : deposit, withdraw, getBalance");
+			System.out.println("Login Sucessful. Session ID: " + server.login(instructions[1], instructions[2]));
+			System.out.println("Please enter instructions in the form \"instruction,accountNum,amount,sessionID \"");
+			System.out.println("Valid Instructions : deposit, withdraw, balance");
 			Operations(server);
 		}
 		else if (instructions[0].equals("deposit")) {
 			server.deposit(Integer.parseInt(instructions[1]), amount, Long.parseLong(instructions[3]));
+			Operations(server);
 		}
-		else if (instructions[0] == "withdraw ") {
+		else if (instructions[0].equals("withdraw")) {
 			server.withdraw(Integer.parseInt(instructions[1]), amount, Long.parseLong(instructions[3]));
+			Operations(server);
 		}
-		else if (instructions[0] == "balance ") {
-			server.getBalance(Integer.parseInt(instructions[1]), Long.parseLong(instructions[2]));
+		else if (instructions[0].equals("balance")) {
+			System.out.println("Account Balance is: " + server.getBalance(Integer.parseInt(instructions[1]), Long.parseLong(instructions[2])));
+			Operations(server);
 		}
 		else {
 			System.out.println("Invalid Instruction: " + instructions[0]);

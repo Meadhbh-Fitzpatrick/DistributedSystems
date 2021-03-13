@@ -27,13 +27,13 @@ public class Bank extends UnicastRemoteObject implements IBank {
 		try {
 			for (Account i:accounts)
 			{
-				if (i.username == username)
+				if (i.username.equals(username))
 				{
-					if (i.password == password)
+					if (i.password.equals(password))
 					{
 						Session sesh = new Session(username);
 						session = sesh;
-						System.out.println("Login Sucessful. Session " + sesh.id + "is valid for 5 minutes.");
+						System.out.println("Login Sucessful. Session " + sesh.id + " is valid for 5 minutes.");
 						return sesh.id;
 					}
 					System.out.println("Login Failed. Invalid Password " + password);
@@ -52,13 +52,15 @@ public class Bank extends UnicastRemoteObject implements IBank {
 
 	public void deposit(int accountnum, BigDecimal amount, long sessionID) throws RemoteException, InvalidSession {
 		try {
+			session.sessionMonitor();
 			if (sessionID != session.id) {
 				throw new InvalidSession();
 				}
 			for (Account i:accounts) {
 				if (accountnum == i.accountNum)
 				{
-					i.balance.add(amount);
+					i.balance = i.balance.add(amount);
+					System.out.println(i.balance.toString());
 				}
 			}
 		}
@@ -69,13 +71,15 @@ public class Bank extends UnicastRemoteObject implements IBank {
 
 	public void withdraw(int accountnum, BigDecimal amount, long sessionID) throws RemoteException, InvalidSession {
 		try {
+			session.sessionMonitor();
 			if (sessionID != session.id) {
 				throw new InvalidSession();
 				}
 			for (Account i:accounts) {
+				
 				if (accountnum == i.accountNum)
 				{
-					i.balance.subtract(amount);
+					i.balance = i.balance.subtract(amount);
 				}
 			}
 		}
@@ -86,6 +90,7 @@ public class Bank extends UnicastRemoteObject implements IBank {
 
 	public BigDecimal getBalance(int accountnum, long sessionID) throws RemoteException, InvalidSession {
 		try {
+			session.sessionMonitor();
 			if (sessionID != session.id) {
 				throw new InvalidSession();
 				}
@@ -104,11 +109,11 @@ public class Bank extends UnicastRemoteObject implements IBank {
 
 	public Statement getStatement(Date from, Date to, long sessionID) throws RemoteException, InvalidSession {
 		try {
+			session.sessionMonitor();
 			if (sessionID != session.id) {
 				throw new InvalidSession();
 				}
 		}
-			// Statement Code to Go Here
 			catch (InvalidSession IS) {
 				System.out.println("Invalid Session for User: " +IS.getUsername());
 			}
@@ -118,7 +123,6 @@ public class Bank extends UnicastRemoteObject implements IBank {
 	public static void main(String args[]) throws Exception {
 		// initialise Bank server - see sample code in the notes and online RMI tutorials for details
 		//Not used to working with BigDecimal (Or Java these days) so this is a little awkward
-		
 		try { 
 			BigDecimal dec = new BigDecimal(10.50);
 			Account jmg = new Account("JackMcGirl", "1234", dec);
