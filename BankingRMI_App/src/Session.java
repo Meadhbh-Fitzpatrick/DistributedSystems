@@ -1,6 +1,5 @@
 import java.rmi.RemoteException;
 import java.time.LocalTime;
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Session {

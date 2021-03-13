@@ -1,12 +1,9 @@
 import java.beans.Statement;
 import java.math.BigDecimal;
 import java.rmi.Naming;
-import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
-import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
 import java.util.List;
 import java.rmi.registry.Registry; 
 import java.rmi.registry.LocateRegistry; 
@@ -14,6 +11,8 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class Bank extends UnicastRemoteObject implements IBank {
 	private static List<Account> accounts = new ArrayList<Account>(); // users accounts
+	private static List<Transaction> transactions = new ArrayList<Transaction>();
+	private static Statement statement;
 	Session session;
 	
 	
@@ -59,6 +58,7 @@ public class Bank extends UnicastRemoteObject implements IBank {
 			for (Account i:accounts) {
 				if (accountnum == i.accountNum)
 				{
+					transactions.add(new Transaction(amount, LocalDate.now(), "Deposit"));
 					i.balance = i.balance.add(amount);
 					System.out.println(i.balance.toString());
 				}
@@ -79,6 +79,7 @@ public class Bank extends UnicastRemoteObject implements IBank {
 				
 				if (accountnum == i.accountNum)
 				{
+					transactions.add(new Transaction(amount, LocalDate.now(), "Withdraw"));
 					i.balance = i.balance.subtract(amount);
 				}
 			}
@@ -107,12 +108,19 @@ public class Bank extends UnicastRemoteObject implements IBank {
 		return null;
 	}
 
-	public Statement getStatement(Date from, Date to, long sessionID) throws RemoteException, InvalidSession {
+	public Statement getStatement(LocalDate from, LocalDate to, long sessionID) throws RemoteException, InvalidSession {
 		try {
 			session.sessionMonitor();
 			if (sessionID != session.id) {
 				throw new InvalidSession();
 				}
+			for (Transaction t:transactions) {
+				if (t.date.isAfter(from)){
+					if (t.date.isBefore(to)) {
+						System.out.println(t.toString());
+					}
+				}
+			}
 		}
 			catch (InvalidSession IS) {
 				System.out.println("Invalid Session for User: " +IS.getUsername());

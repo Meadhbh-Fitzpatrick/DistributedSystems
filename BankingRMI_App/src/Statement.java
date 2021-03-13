@@ -1,33 +1,32 @@
-import java.util.Date;
 import java.util.List;
+import java.time.LocalDate;
 
-public class Statement implements IStatement {
+public class Statement implements IStatement  {
 
 	private static final long serialVersionUID = -3393428484808591906L;
+	private int accountNum;
+	private LocalDate startDate, endDate;
+	private String accountName;
+    private List<Transaction> t;
 
 	public int getAccountnum() {
-		// TODO Auto-generated method stub
-		return 0;
+		return accountNum;
 	}
 
-	public Date getStartDate() {
-		// TODO Auto-generated method stub
-		return null;
+	public LocalDate getStartDate() {
+		return startDate;
 	}
 
-	public Date getEndDate() {
-		// TODO Auto-generated method stub
-		return null;
+	public LocalDate getEndDate() {
+		return endDate;
 	}
 
 	public String getAccoutName() {
-		// TODO Auto-generated method stub
-		return null;
+		return accountName;
 	}
 
 	public List<Transaction> getTransactions() {
-		// TODO Auto-generated method stub
-		return null;
+		return t;
 	}
 
 }
