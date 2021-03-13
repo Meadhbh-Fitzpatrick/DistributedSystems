@@ -15,6 +15,8 @@ import java.rmi.server.UnicastRemoteObject;
 public class Bank extends UnicastRemoteObject implements IBank {
 	private static List<Account> accounts = new ArrayList<Account>(); // users accounts
 	Session session;
+	
+	
 	public Bank() throws RemoteException
 	{
 		super();
@@ -31,10 +33,13 @@ public class Bank extends UnicastRemoteObject implements IBank {
 					{
 						Session sesh = new Session(username);
 						session = sesh;
+						System.out.println("Login Sucessful. Session " + sesh.id + "is valid for 5 minutes.");
 						return sesh.id;
 					}
+					System.out.println("Login Failed. Invalid Password " + password);
 					throw new InvalidLogin();
 				}
+				System.out.println("Login Failed. Invalid Username " + username);
 				throw new InvalidLogin();
 			}
 			throw new InvalidLogin();
@@ -42,7 +47,7 @@ public class Bank extends UnicastRemoteObject implements IBank {
 		catch (InvalidLogin IL){
 				System.out.println("Invalid Login for User: " +IL.getUsername());
 			}
-		return (Long) null;
+		return session.id;
 	}
 
 	public void deposit(int accountnum, BigDecimal amount, long sessionID) throws RemoteException, InvalidSession {
@@ -113,22 +118,23 @@ public class Bank extends UnicastRemoteObject implements IBank {
 	public static void main(String args[]) throws Exception {
 		// initialise Bank server - see sample code in the notes and online RMI tutorials for details
 		//Not used to working with BigDecimal (Or Java these days) so this is a little awkward
-		BigDecimal dec = new BigDecimal(10.50);
-		Account jmg = new Account("Jack McGirl", "1234", dec);
-		dec = dec.add(dec);
-		Account mf = new Account("Meadhbh Fitzpatrick", "2020", dec);
-		accounts.add(jmg);
-		accounts.add(mf);
+		
 		try { 
-			 //System.setSecurityManager(new SecurityManager());
-			 //LocateRegistry.createRegistry(2020);
-	         IBank bank = new Bank(); 
-	         Registry registry = LocateRegistry.createRegistry(2001);
-	         registry.rebind("Bank", bank);
-	         System.err.println("Server ready"); 
+			BigDecimal dec = new BigDecimal(10.50);
+			Account jmg = new Account("JackMcGirl", "1234", dec);
+			dec = dec.add(dec);
+			Account mf = new Account("MeadhbhFitzpatrick", "2020", dec);
+			accounts.add(jmg);
+			accounts.add(mf);
+			System.out.println("Account created. Username :" + jmg.username + " Account No. : " + jmg.accountNum);
+			System.out.println("Account created. Username :" + mf.username + " Account No. : " + mf.accountNum);
+	        IBank bank = new Bank(); 
+	        Registry registry = LocateRegistry.createRegistry(2001);
+	        registry.rebind("Bank", bank);
+	        System.err.println("Server ready"); 
 	      } catch (Exception e) { 
-	         System.err.println("Server exception: " + e.toString()); 
-	         e.printStackTrace(); 
+	        System.err.println("Server exception: " + e.toString()); 
+	        e.printStackTrace(); 
 	      } 
 		}
 }

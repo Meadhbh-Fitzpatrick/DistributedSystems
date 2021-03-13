@@ -12,7 +12,11 @@ public class Account {
 		username = Username;
 		this.password = password;
 		balance = openingBalance;
-		accountNum = accountNum++;
-		accountNum++;
+		accountNum = AccNum();
 	}
+	
+	 public int AccNum() {
+		 accountNum++;
+		 return accountNum;
+	 }
 }
